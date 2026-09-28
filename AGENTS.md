@@ -40,7 +40,7 @@
 ## Enforcement Rules (Ditegakkan Secara Teknis oleh Hookify)
 Aturan berikut tidak bisa dilanggar — ditegakkan oleh hookify rule di `.claude/hookify.*.local.md`:
 
-- **`npm run build`**: DIBLOKIR kecuali pengguna secara eksplisit meminta. Jika ingin build, tanyakan dulu kepada pengguna.
+- **`npx nuxt build`, `npm run build`, `npm run generate`, `npm run preview`**: DILARANG KERAS di lingkungan local. Tidak boleh dijalankan kecuali pengguna secara eksplisit meminta untuk deploy. Selalu gunakan `npm run dev` untuk pengembangan lokal.
 - **`npm run dev`**: DIBLOKIR kecuali pengguna secara eksplisit meminta. Jika dev server mati, JANGAN jalankan sendiri — minta pengguna untuk menjalankannya.
 - **Komentar Indonesia**: Setiap baris kode (`.vue`, `.ts`, `.js`) WAJIB memiliki komentar dalam bahasa Indonesia. Tanpa komentar ID, file tidak boleh disimpan. Aturan ini berlaku retroaktif untuk semua kode yang sudah ada.
 - **Semua komentar harus dalam bahasa Indonesia** — menjelaskan fungsi, parameter, return value, dan logika bisnis dari setiap bagian kode.

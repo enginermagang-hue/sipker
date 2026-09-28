@@ -38,42 +38,57 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <!-- Container utama halaman tambah kegiatan -->
-  <div class="p-8">
-    <!-- Judul halaman -->
-    <h1 class="text-2xl font-bold text-slate-900 mb-6">Tambah Kegiatan</h1>
-    <!-- Formulir untuk input data kegiatan baru -->
-    <UForm :state="form" class="space-y-5 max-w-3xl bg-white p-6 rounded-xl shadow-sm" @submit.prevent="handleSubmit">
-      <!-- Field tanggal dan waktu kegiatan -->
-      <UFormField label="Tanggal & Waktu Kegiatan">
-        <UInput v-model="form.activityAt" type="datetime-local" />
-      </UFormField>
-      <!-- Field pemilihan sekolah -->
-      <UFormField label="Sekolah">
-        <USelect v-model="form.schoolId" :items="schoolOptions" placeholder="Pilih sekolah" />
-      </UFormField>
-      <!-- Field nama guru/konsultan -->
-      <UFormField label="Nama Guru / Konsultan">
-        <UInput v-model="form.consultantName" placeholder="Nama lengkap" />
-      </UFormField>
-      <!-- Field pemilihan kategori kegiatan -->
-      <UFormField label="Kategori Kegiatan">
-        <USelect v-model="form.categoryId" :items="categoryOptions" placeholder="Pilih kategori" />
-      </UFormField>
-      <!-- Field topik konsultasi -->
-      <UFormField label="Topik Konsultasi">
-        <UTextarea v-model="form.topic" placeholder="Ringkasan masalah" />
-      </UFormField>
-      <!-- Field tindakan yang dilakukan -->
-      <UFormField label="Tindakan yang Dilakukan">
-        <UTextarea v-model="form.actionTaken" placeholder="Apa yang dilakukan petugas" />
-      </UFormField>
-      <!-- Field hasil / tindak lanjut -->
-      <UFormField label="Hasil / Tindak Lanjut">
-        <UTextarea v-model="form.result" placeholder="Hasil kegiatan" />
-      </UFormField>
-      <!-- Tombol simpan draft -->
-      <UButton type="submit" :loading="loading" class="w-full">Simpan Draft</UButton>
-    </UForm>
-  </div>
+  <!-- Panel dengan navbar untuk halaman tambah kegiatan — pola dashboard template -->
+  <UDashboardPanel id="activities-new">
+    <template #header>
+      <UDashboardNavbar title="Tambah Kegiatan">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+        <template #right>
+          <UColorModeButton />
+        </template>
+      </UDashboardNavbar>
+    </template>
+    <template #body>
+      <!-- Container utama halaman tambah kegiatan -->
+      <div>
+        <!-- Judul halaman -->
+        <h1 class="text-2xl font-bold text-slate-900 mb-6">Tambah Kegiatan</h1>
+        <!-- Formulir untuk input data kegiatan baru -->
+        <UForm :state="form" class="space-y-5 max-w-3xl bg-white p-6 rounded-xl shadow-sm" @submit.prevent="handleSubmit">
+          <!-- Field tanggal dan waktu kegiatan -->
+          <UFormField label="Tanggal & Waktu Kegiatan">
+            <UInput v-model="form.activityAt" type="datetime-local" />
+          </UFormField>
+          <!-- Field pemilihan sekolah -->
+          <UFormField label="Sekolah">
+            <USelect v-model="form.schoolId" :items="schoolOptions" placeholder="Pilih sekolah" />
+          </UFormField>
+          <!-- Field nama guru/konsultan -->
+          <UFormField label="Nama Guru / Konsultan">
+            <UInput v-model="form.consultantName" placeholder="Nama lengkap" />
+          </UFormField>
+          <!-- Field pemilihan kategori kegiatan -->
+          <UFormField label="Kategori Kegiatan">
+            <USelect v-model="form.categoryId" :items="categoryOptions" placeholder="Pilih kategori" />
+          </UFormField>
+          <!-- Field topik konsultasi -->
+          <UFormField label="Topik Konsultasi">
+            <UTextarea v-model="form.topic" placeholder="Ringkasan masalah" />
+          </UFormField>
+          <!-- Field tindakan yang dilakukan -->
+          <UFormField label="Tindakan yang Dilakukan">
+            <UTextarea v-model="form.actionTaken" placeholder="Apa yang dilakukan petugas" />
+          </UFormField>
+          <!-- Field hasil / tindak lanjut -->
+          <UFormField label="Hasil / Tindak Lanjut">
+            <UTextarea v-model="form.result" placeholder="Hasil kegiatan" />
+          </UFormField>
+          <!-- Tombol simpan draft -->
+          <UButton type="submit" :loading="loading" class="w-full">Simpan Draft</UButton>
+        </UForm>
+      </div>
+    </template>
+  </UDashboardPanel>
 </template>

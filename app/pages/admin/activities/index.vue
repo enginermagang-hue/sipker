@@ -52,69 +52,84 @@ const { data: activities } = useAsyncData<any[]>('activities', async () => {
 </script>
 
 <template>
-  <!-- Container utama halaman daftar kegiatan -->
-  <div class="p-8">
-    <!-- Header halaman dengan judul dan tombol tambah kegiatan -->
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-slate-900">Semua Kegiatan</h1>
-      <UButton to="/admin/activities/new" size="sm">Tambah Kegiatan</UButton>
-    </div>
+  <!-- Panel dengan navbar untuk halaman daftar kegiatan — pola dashboard template -->
+  <UDashboardPanel id="activities">
+    <template #header>
+      <UDashboardNavbar title="Kegiatan">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+        <template #right>
+          <UColorModeButton />
+        </template>
+      </UDashboardNavbar>
+    </template>
+    <template #body>
+      <!-- Container utama halaman daftar kegiatan -->
+      <div>
+        <!-- Header halaman dengan judul dan tombol tambah kegiatan -->
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="text-2xl font-bold text-slate-900">Semua Kegiatan</h1>
+          <UButton to="/admin/activities/new" size="sm">Tambah Kegiatan</UButton>
+        </div>
 
-    <!-- Baris filter untuk pencarian dan penyaringan kegiatan -->
-    <div class="bg-white rounded-xl shadow-sm p-4 mb-6 border border-slate-100">
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <!-- Input pencarian berdasarkan nama konsultan -->
-        <UInput placeholder="Cari konsultan..." v-model="filters.search" size="sm" />
-        <!-- Dropdown filter status -->
-        <USelect placeholder="Status" v-model="filters.status" :items="statusOptions" size="sm" />
-        <!-- Dropdown filter wilayah -->
-        <USelect placeholder="Wilayah" v-model="filters.regionId" :items="regionOptions" size="sm" />
-        <!-- Input filter tanggal dari -->
-        <UInput type="date" v-model="filters.from" placeholder="Dari" size="sm" />
-        <!-- Input filter tanggal sampai -->
-        <UInput type="date" v-model="filters.to" placeholder="Sampai" size="sm" />
+        <!-- Baris filter untuk pencarian dan penyaringan kegiatan -->
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6 border border-slate-100">
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <!-- Input pencarian berdasarkan nama konsultan -->
+            <UInput placeholder="Cari konsultan..." v-model="filters.search" size="sm" />
+            <!-- Dropdown filter status -->
+            <USelect placeholder="Status" v-model="filters.status" :items="statusOptions" size="sm" />
+            <!-- Dropdown filter wilayah -->
+            <USelect placeholder="Wilayah" v-model="filters.regionId" :items="regionOptions" size="sm" />
+            <!-- Input filter tanggal dari -->
+            <UInput type="date" v-model="filters.from" placeholder="Dari" size="sm" />
+            <!-- Input filter tanggal sampai -->
+            <UInput type="date" v-model="filters.to" placeholder="Sampai" size="sm" />
+          </div>
+        </div>
+
+        <!-- Tabel daftar kegiatan -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <table class="w-full text-sm">
+            <!-- Header tabel dengan kolom-kolom data kegiatan -->
+            <thead class="bg-slate-50 text-slate-600 font-medium">
+              <tr>
+                <th class="px-4 py-3 text-left">Tanggal</th>
+                <th class="px-4 py-3 text-left">Konsultan</th>
+                <th class="px-4 py-3 text-left">Sekolah</th>
+                <th class="px-4 py-3 text-left">Kategori</th>
+                <th class="px-4 py-3 text-left">Status</th>
+                <th class="px-4 py-3 text-left">Bukti</th>
+                <th class="px-4 py-3 text-left">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Baris tabel untuk setiap kegiatan -->
+              <tr v-for="item in activities" :key="item.id" class="border-t border-slate-100 hover:bg-slate-50">
+                <!-- Tanggal kegiatan -->
+                <td class="px-4 py-3">{{ formatDate(item.activityAt) }}</td>
+                <!-- Nama konsultan -->
+                <td class="px-4 py-3">{{ item.consultantName }}</td>
+                <!-- Nama sekolah -->
+                <td class="px-4 py-3">{{ item.schoolName }}</td>
+                <!-- Nama kategori -->
+                <td class="px-4 py-3">{{ item.categoryName }}</td>
+                <!-- Status dengan badge warna -->
+                <td class="px-4 py-3">
+                  <span :class="statusBadge(item.status)" class="inline-block px-2 py-0.5 rounded-full text-xs font-medium">{{ item.status }}</span>
+                </td>
+                <!-- Jumlah bukti -->
+                <td class="px-4 py-3">{{ item.evidenceCount || 0 }}</td>
+                <!-- Tautan detail kegiatan -->
+                <td class="px-4 py-3">
+                  <NuxtLink :to="`/admin/activities/${item.id}`" class="text-blue-600 hover:text-blue-800 text-xs font-medium">Detail</NuxtLink>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
-
-    <!-- Tabel daftar kegiatan -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-      <table class="w-full text-sm">
-        <!-- Header tabel dengan kolom-kolom data kegiatan -->
-        <thead class="bg-slate-50 text-slate-600 font-medium">
-          <tr>
-            <th class="px-4 py-3 text-left">Tanggal</th>
-            <th class="px-4 py-3 text-left">Konsultan</th>
-            <th class="px-4 py-3 text-left">Sekolah</th>
-            <th class="px-4 py-3 text-left">Kategori</th>
-            <th class="px-4 py-3 text-left">Status</th>
-            <th class="px-4 py-3 text-left">Bukti</th>
-            <th class="px-4 py-3 text-left">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Baris tabel untuk setiap kegiatan -->
-          <tr v-for="item in activities" :key="item.id" class="border-t border-slate-100 hover:bg-slate-50">
-            <!-- Tanggal kegiatan -->
-            <td class="px-4 py-3">{{ formatDate(item.activityAt) }}</td>
-            <!-- Nama konsultan -->
-            <td class="px-4 py-3">{{ item.consultantName }}</td>
-            <!-- Nama sekolah -->
-            <td class="px-4 py-3">{{ item.schoolName }}</td>
-            <!-- Nama kategori -->
-            <td class="px-4 py-3">{{ item.categoryName }}</td>
-            <!-- Status dengan badge warna -->
-            <td class="px-4 py-3">
-              <span :class="statusBadge(item.status)" class="inline-block px-2 py-0.5 rounded-full text-xs font-medium">{{ item.status }}</span>
-            </td>
-            <!-- Jumlah bukti -->
-            <td class="px-4 py-3">{{ item.evidenceCount || 0 }}</td>
-            <!-- Tautan detail kegiatan -->
-            <td class="px-4 py-3">
-              <NuxtLink :to="`/admin/activities/${item.id}`" class="text-blue-600 hover:text-blue-800 text-xs font-medium">Detail</NuxtLink>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+    </template>
+  </UDashboardPanel>
 </template>

@@ -2,7 +2,8 @@ import { drizzle } from 'drizzle-orm/libsql'
 import { createClient } from '@libsql/client'
 import { randomUUID } from 'node:crypto'
 import * as schema from './schema'
-import { roles } from './schema'
+import { roles, users } from './schema'
+import { hashPassword } from '../utils/password'
 
 // Membuat client LibSQL untuk koneksi ke database Turso
 // Menggunakan URL dan auth token dari environment variable
@@ -116,8 +117,27 @@ async function main() {
   // Log untuk menandai proses seeding region selesai
   console.log('Regions seeded.')
 
+  // Fetch admin role ID untuk membuat user admin
+  const [adminRole] = await db.select().from(schema.roles).where(schema.eq(schema.roles.code, 'admin'))
+  if (!adminRole) throw new Error('Admin role not found')
+
+  // Insert user admin default
+  await db.insert(users).values({
+    id: randomUUID(),
+    roleId: adminRole.id,
+    regionId: null, // Admin tidak terikat region
+    name: 'Admin',
+    email: 'admin@uptdtekkomdik.local',
+    passwordHash: hashPassword('admin123'),
+    position: 'Administrator',
+    isActive: 1,
+    createdAt: now,
+    updatedAt: now,
+  })
+  console.log('Admin user seeded.')
+
   // Log final untuk menandai proses seeding selesai seluruhnya
-  console.log('Done.')
+  console.log('Seeding complete.')
 }
 
 // Menjalankan fungsi utama dan menangani error jika terjadi kegagalan

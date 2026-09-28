@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { getCookie } from 'h3'
 import { createDb } from '#server/database/index'
 import { users, roles, sessions } from '#server/database/schema'
 import { and, eq, isNull } from 'drizzle-orm'

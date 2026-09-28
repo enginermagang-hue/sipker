@@ -27,3 +27,6 @@ logs
 dev.err
 login.json
 bootstrap-admin.ts
+
+# Hookify local rules
+.claude/*.local.md

@@ -52,6 +52,30 @@ Sumber keputusan utama:
 - [x] Tambahkan `.claude/*.local.md` ke `.gitignore`
 - [x] Retroaktif: tambahkan komentar ID ke semua ~48 file kode `.vue`, `.ts`, `.js` di `app/` dan `server/`
 - [x] Update `PROGRESS.md` — dokumentasikan semua perubahan
+- [x] Sesuaikan layout admin SIPKER dengan dashboard template (nuxt-ui-templates/dashboard)
+  - Buat `app/app.config.ts` — konfigurasi warna primary green, neutral zinc
+  - Update `app/app.vue` — ganti `<div>` → `<UApp>`, tambahkan `<NuxtLoadingIndicator />`, `useHead` + `useSeoMeta`
+  - Rewrite `app/layouts/default.vue` — tambahkan `UDashboardSearchButton`, `UDashboardSearch`, `NotificationsSlideover`, cookie consent toast, role-based navigation dipertahankan
+  - Update `nuxt.config.ts` — tambahkan `@nuxt/eslint`, `@vueuse/nuxt` modules, update `compatibilityDate` ke `2026-06-30`, tambahkan `routeRules` CORS dan `eslint` config
+  - Update `app/assets/css/main.css` — tambahkan custom green theme palette (50-950) dan `--font-sans`
+  - Buat `app/types/index.d.ts` — type definitions untuk User, Mail, Member, Stat, Sale, Notification, dll
+  - Buat `app/utils/index.ts` — utility functions `randomInt`, `randomFrom`
+  - Buat `app/composables/useDashboard.ts` — keyboard shortcuts dan `isNotificationsSlideoverOpen` state
+  - Update `package.json` — tambahkan `@vueuse/core`, `@vueuse/nuxt`, `@nuxt/eslint`, `eslint`, `eslint-plugin-better-tailwindcss`, `typescript`, `vue-tsc`
+  - Install dependencies — `@vueuse/nuxt@14.4.0`, `@nuxt/eslint@1.17.0` berhasil diinstal
+  - Verifikasi build — `nuxt build` berhasil, client dan server built tanpa error
+  - Pindahkan `UDashboardPanel` + `UDashboardNavbar` ke setiap halaman (Opsi C)
+  - Layout hanya berisi sidebar, search, slot, notifications; setiap halaman wrap dengan Panel+Navbar
+  - Halaman yang diupdate: index, admin, activities, activities/new, activities/[id], regions
+  - Remove class padding (p-4, p-6, p-8, sm:p-6) dari body slot wrapper di setiap halaman
+  - Tambah TanStack Table (@tanstack/table-core, scule) ke halaman wilayah
+  - Buat komponen terpisah: app/components/regions/RegionsAddModal.vue, RegionsDeleteModal.vue
+  - Tambah search box, status filter (Aktif/Nonaktif/Semua), column visibility toggle ke wilayah
+- Tambah tombol "Tambah Wilayah" ke navbar (seperti dashboard template customers)
+- Verifikasi dengan npx vue-tsc --noEmit — type check berhasil
+- Perbaiki tombol close modal: ganti defineProps<{ open: boolean }>() → defineModel<boolean>('open') pada RegionsAddModal.vue dan RegionsDeleteModal.vue
+- Perbaiki chain event: @update:open="emit('close')" → @update:open="open = false" dan @click="emit('close')" → @click="open = false"
+- Update regions/index.vue: :open="addModalOpen" @update:open="addModalOpen = false" → v-model:open="addModalOpen"
 
 ## Yang Belum Dikerjakan
 
@@ -91,20 +115,30 @@ Sumber keputusan utama:
 | Hookify rules | Berhasil | 3 rule: block-npm-build, block-npm-dev, require-id-comments |
 | Retroactive ID comments | Berhasil | ~48 file .vue/.ts/.js sudah diberi komentar ID |
 | AGENTS.md enforcement | Berhasil | Bagian Enforcement Rules ditambahkan |
+| Layout dashboard template | Berhasil | app.config.ts, app.vue, default.vue, nuxt.config.ts, CSS, types, utils, composable |
+| Dependencies | Berhasil | @vueuse/nuxt, @nuxt/eslint terinstall |
+| Build | Berhasil | `nuxt build` sukses — client + server |
 | Typecheck | Belum tersedia | Belum ada script khusus |
 | Test | Belum tersedia | Belum ada framework/test script |
 | UAT | Belum dimulai | Menunggu frontend |
+
+- [x] Periksa koneksi Turso — script `scripts/check-turso.ts` dan `scripts/test-turso-insert.ts` berhasil; DB READ/INSERT/DELETE semua berhasil (token masih valid)
+- [x] Periksa `post.ts` — kode sudah lengkap, komentar ID lengkap, insert berhasil saat diuji langsung
+- [x] Tambah logging eksplisit di `post.ts`: log body (`JSON.stringify`), koneksi DB (`createDb`), proses insert (`console.log` sebelum/sesudah), sukses (`id`, `code`, `name`, `isActive`), error (`message`, `stack`), `createError` — semua baris memiliki komentar ID
+- [x] Tambah logging eksplisit di `regions/index.vue`: `console.log` setelah submit dan refresh
+- [x] Data wilayah masih muncul karena data seed tersimpan di Turso; masalah "tambah wilayah belum bekerja" kemungkinan filter (`searchQuery`/`statusFilter`) menyembunyikan data baru — verifikasi dengan mengubah filter ke "Semua" atau menghapus search
 
 ## Langkah Berikutnya
 
 1. Uji halaman Wilayah (tambah, edit, nonaktifkan, hapus) di `/admin/regions`.
 2. Uji halaman login (`UAuthForm`) dan redirect ke `/admin/`.
 3. Uji hookify rules (blokir `npm run build`, `npm run dev`, dan komentar ID).
-4. Buat halaman Koordinator (`pages/koordinator/`) dan Anggota (`pages/anggota/`).
-5. Lengkapi form kegiatan dengan upload bukti di browser.
-6. Pemeriksaan Kepala (status `needs_revision` / `checked`) via UI.
-7. Laporan PDF/Excel.
-8. UAT dan deployment Vercel.
+4. Uji layout baru — sidebar search, notifications slideover, cookie consent, keyboard shortcuts.
+5. Buat halaman Koordinator (`pages/koordinator/`) dan Anggota (`pages/anggota/`).
+6. Lengkapi form kegiatan dengan upload bukti di browser.
+7. Pemeriksaan Kepala (status `needs_revision` / `checked`) via UI.
+8. Laporan PDF/Excel.
+9. UAT dan deployment Vercel.
 
 ## Aturan Pembaruan
 

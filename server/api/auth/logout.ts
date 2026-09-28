@@ -1,5 +1,7 @@
 // Mengimpor fungsi createHash dari modul crypto Node.js untuk hashing token
 import { createHash } from 'node:crypto'
+// Mengimpor fungsi getCookie dan clearCookie dari h3 untuk menangani cookie sesi
+import { getCookie, deleteCookie } from 'h3'
 // Mengimpor fungsi createDb untuk membuat koneksi database
 import { createDb } from '#server/database/index'
 // Mengimpor skema sessions dari database
@@ -24,7 +26,7 @@ export default defineEventHandler(async (event) => {
     await db.update(sessions).set({ revokedAt: new Date().toISOString() }).where(eq(sessions.tokenHash, tokenHash))
   }
   // Menghapus cookie 'sid' dari browser untuk menghancurkan sesi di sisi client
-  clearCookie(event, 'sid', { path: '/' })
+  deleteCookie(event, 'sid', { path: '/' })
   // Mengembalikan response sukses
   return { ok: true }
 })

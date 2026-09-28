@@ -1,13 +1,17 @@
 // Konfigurasi utama aplikasi Nuxt 4 — mendefinisikan pengaturan kompatibilitas, modul, CSS, dan variabel konfigurasi runtime
 export default defineNuxtConfig({
   // Tanggal kompatibilitas fitur Nuxt — menentukan versi baseline yang digunakan oleh framework
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: '2026-06-30',
   // Mengaktifkan panel devtools untuk debugging pengembangan
   devtools: { enabled: true },
   // Modul resmi yang diimpor — @nuxt/ui menyediakan komponen antarmuka pengguna Si Kinerja
-  modules: ['@nuxt/ui'],
+  modules: ['@nuxt/ui', '@nuxt/eslint', '@vueuse/nuxt'],
   // File CSS global yang diterapkan ke seluruh aplikasi — styles dasar Si Kinerja
   css: ['~/assets/css/main.css'],
+  // Aturan rute — mengizinkan CORS untuk endpoint API
+  routeRules: {
+    '/api/**': { cors: true }
+  },
   // Konfigurasi runtime — variabel lingkungan yang tersedia di server dan client
   runtimeConfig: {
     // Secret session untuk mengautentikasi pengguna dalam sesi
@@ -36,4 +40,15 @@ export default defineNuxtConfig({
       appName: 'SI Kinerja',
     },
   },
+  // Konfigurasi ESLint — aturan stylistic untuk konsistensi kode
+  eslint: {
+    config: {
+      stylistic: {
+        // Tidak menambahkan koma di akhir baris
+        commaDangle: 'never',
+        // Menggunakan gaya braces 1tbs (1 tab, single)
+        braceStyle: '1tbs'
+      }
+    }
+  }
 })

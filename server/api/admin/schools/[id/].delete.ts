@@ -2,12 +2,6 @@
 // Hanya dapat diakses oleh user dengan role 'admin'.
 // Tidak menghapus data secara permanen, melainkan mengisi kolom deletedAt dengan timestamp saat ini.
 // Mengembalikan data sekolah yang telah dihapus, atau melempar error 404 jika sekolah tidak ditemukan.
-import { and, eq, isNull } from 'drizzle-orm'
-import { createDb } from '#server/database/index'
-import { schools } from '#server/database/schema'
-import { requireAuth } from '#server/utils/session'
-import { requireRole } from '#server/utils/authz'
-
 export default defineEventHandler(async (event) => {
   // Mengautentikasi user dari request event dan memastikan user telah login.
   const user = await requireAuth(event)

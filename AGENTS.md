@@ -35,5 +35,12 @@
 - Keep changes focused; the repository is still a starter and has no established feature module conventions.
 - When adding persistence, follow `DATABASE.md`: foreign keys, parameterized queries, migrations, indexes, soft deletion, and region-scoped access.
 - Keep secrets and personal data out of logs and committed files; `.env` files are ignored.
-- When build verification is explicitly requested, run `npm run build` and report any dependency warnings separately from actual failures.
 - After completing any feature, fix, refactor, or implementation change, update `PROGRESS.md` in the same change with the date, summary, affected area, verification result, and remaining next step.
+
+## Enforcement Rules (Ditegakkan Secara Teknis oleh Hookify)
+Aturan berikut tidak bisa dilanggar — ditegakkan oleh hookify rule di `.claude/hookify.*.local.md`:
+
+- **`npm run build`**: DIBLOKIR kecuali pengguna secara eksplisit meminta. Jika ingin build, tanyakan dulu kepada pengguna.
+- **`npm run dev`**: DIBLOKIR kecuali pengguna secara eksplisit meminta. Jika dev server mati, JANGAN jalankan sendiri — minta pengguna untuk menjalankannya.
+- **Komentar Indonesia**: Setiap baris kode (`.vue`, `.ts`, `.js`) WAJIB memiliki komentar dalam bahasa Indonesia. Tanpa komentar ID, file tidak boleh disimpan. Aturan ini berlaku retroaktif untuk semua kode yang sudah ada.
+- **Semua komentar harus dalam bahasa Indonesia** — menjelaskan fungsi, parameter, return value, dan logika bisnis dari setiap bagian kode.

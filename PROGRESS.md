@@ -33,10 +33,12 @@ Sumber keputusan utama:
 - [x] Download bukti dengan otorisasi region/ownership.
 - [x] Audit log helper (`writeAudit`).
 - [x] Frontend: login (`UAuthForm`), root, dashboard admin, activities list/detail/new, sidebar, layout.
-- [x] Middleware auth global (`defineNuxtRouteMiddleware`, tanpa `node:crypto`).
-- [x] Build production berhasil (`EXIT=True`).
-- [x] Halaman Admin Kelola Wilayah (`/admin/regions`) — tabel + modal tambah/edit, toggle aktif/nonaktif, soft delete dengan konfirmasi.
-- [x] Endpoint `PATCH /api/admin/regions/[id]` untuk update wilayah.
+- [x] Fix sidebar tidak konsisten antara `/` dan `/admin` — `/` sekarang pakai layout `default` sehingga sidebar muncul untuk semua halaman
+- [x] Fix `auth.global.ts` redirect — user login di `/` otomatis diarahkan ke `/admin` atau `/admin/activities` berdasarkan role
+- [x] Hapus `Sidebar.vue` (dead code, tidak terpakai) — hanya `UDashboardSidebar` di `default.vue` yang aktif
+- [x] Buat middleware `admin.ts` — memblokir akses halaman admin untuk non-admin role
+- [x] Terapkan middleware `admin` ke semua halaman `/admin/*` (`index`, `regions`, `activities`, `activities/new`, `activities/[id]`)
+- [x] Fix `auth.global.ts` — `/` dimasukkan ke `publicPages`, redirect `/login` dan `/` berdasarkan role
 - [x] Fix SSR error `computed.fn is not a function` — hapus `computed` dari render path halaman wilayah & activities, ganti ke `useAsyncData` langsung.
 - [x] Fix warning duplicated imports `requireRole`/`requireRegionScope` — hapus re-export dari `session.ts`, pisahkan import dari `authz.ts` di 17 file API.
 - [x] `.gitignore` — tambahkan `dev.err`, `login.json`, `bootstrap-admin.ts` (file sensitif/untracked).
@@ -44,6 +46,12 @@ Sumber keputusan utama:
 - [x] Fix `USelect :options` → `:items` di `activities/index.vue` dan `activities/new.vue` (API v4).
 - [x] Ganti `alert()` dengan `useToast()` di halaman wilayah.
 - [x] List wilayah pakai `UTable` + `UCard` (pola sipersa) — kolom `code`, `name`, `description`, `isActive` (badge), aksi (edit/toggle/hapus).
+- [x] Tambahkan komentar Bahasa Indonesia pada semua 10 file handler API admin (`schools/*` dan `categories/*`) — menjelaskan fungsi, parameter, return value, dan business logic setiap handler
+- [x] Buat 3 hookify rule di `.claude/`: block `npm run build`, block `npm run dev`, require ID comments pada `.vue/.ts/.js`
+- [x] Update `AGENTS.md` — tambahkan bagian "Enforcement Rules" yang ditegakkan secara teknis oleh hookify
+- [x] Tambahkan `.claude/*.local.md` ke `.gitignore`
+- [x] Retroaktif: tambahkan komentar ID ke semua ~48 file kode `.vue`, `.ts`, `.js` di `app/` dan `server/`
+- [x] Update `PROGRESS.md` — dokumentasikan semua perubahan
 
 ## Yang Belum Dikerjakan
 
@@ -80,7 +88,9 @@ Sumber keputusan utama:
 | Duplicated imports | Berhasil | Warning hilang setelah pisahkan import `authz.ts` |
 | Modal Wilayah | Berhasil | Pola sipersa — `UModal` + `#body` + `UForm` |
 | Tabel Wilayah | Berhasil | `UTable` + `UCard`, kolom via `h()` render |
-| Lint | Belum tersedia | Belum ada script/configuration |
+| Hookify rules | Berhasil | 3 rule: block-npm-build, block-npm-dev, require-id-comments |
+| Retroactive ID comments | Berhasil | ~48 file .vue/.ts/.js sudah diberi komentar ID |
+| AGENTS.md enforcement | Berhasil | Bagian Enforcement Rules ditambahkan |
 | Typecheck | Belum tersedia | Belum ada script khusus |
 | Test | Belum tersedia | Belum ada framework/test script |
 | UAT | Belum dimulai | Menunggu frontend |
@@ -89,14 +99,19 @@ Sumber keputusan utama:
 
 1. Uji halaman Wilayah (tambah, edit, nonaktifkan, hapus) di `/admin/regions`.
 2. Uji halaman login (`UAuthForm`) dan redirect ke `/admin/`.
-2. Buat halaman Koordinator (`pages/koordinator/`) dan Anggota (`pages/anggota/`).
-3. Lengkapi form kegiatan dengan upload bukti di browser.
-4. Pemeriksaan Kepala (status `needs_revision` / `checked`) via UI.
-5. Laporan PDF/Excel.
-6. UAT dan deployment Vercel.
+3. Uji hookify rules (blokir `npm run build`, `npm run dev`, dan komentar ID).
+4. Buat halaman Koordinator (`pages/koordinator/`) dan Anggota (`pages/anggota/`).
+5. Lengkapi form kegiatan dengan upload bukti di browser.
+6. Pemeriksaan Kepala (status `needs_revision` / `checked`) via UI.
+7. Laporan PDF/Excel.
+8. UAT dan deployment Vercel.
 
 ## Aturan Pembaruan
 
 Setiap kali fitur, perbaikan, refactor, atau perubahan implementasi selesai, perbarui `PROGRESS.md` pada perubahan yang sama. Tambahkan tanggal, ringkasan pekerjaan, file/fitur yang terdampak, hasil verifikasi, dan kendala atau langkah berikutnya. Jangan menandai pekerjaan selesai tanpa hasil verifikasi.
 
 Jangan menjalankan `npm run build` secara otomatis. Jalankan perintah tersebut hanya jika pengguna memintanya atau menyetujuinya secara eksplisit.
+
+Jangan menjalankan `npm run dev` secara otomatis. Jika dev server mati, minta pengguna untuk menjalankannya.
+
+Setiap baris kode yang ditulis harus memiliki komentar dalam bahasa Indonesia. Aturan ini ditegakkan secara teknis oleh hookify rule di `.claude/hookify.*.local.md`.

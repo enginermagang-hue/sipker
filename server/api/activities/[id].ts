@@ -4,11 +4,16 @@ import { activities, schools, activityCategories, users, regions, evidence, acti
 import { requireAuth } from '#server/utils/session'
 import { requireRole } from '#server/utils/authz'
 
+// Handler utama untuk endpoint GET /api/activities/:id
+// Mengambil detail satu aktivitas beserta bukti (evidence) dan ulasan (reviews)
+// Parameter: id dari URL router
+// Return: { data: detail aktivitas, evidence: daftar bukti, reviews: daftar ulasan }
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event)
   const id = getRouterParam(event, 'id')!
   const db = createDb()
 
+  // Query detail aktivitas dengan join ke sekolah, kategori, pengguna, dan region
   const [row] = await db
     .select({
       id: activities.id,
@@ -48,13 +53,17 @@ export default defineEventHandler(async (event) => {
     .where(and(eq(activities.id, id), isNull(activities.deletedAt)))
     .limit(1)
 
+  // Jika aktivitas tidak ditemukan, kembalikan error 404
   if (!row) throw createError({ statusCode: 404, statusMessage: 'Activity not found' })
 
-  // Authorization
+  // Authorization: anggota hanya bisa mengakses aktivitas miliknya sendiri
+  // Koordinator hanya bisa mengakses aktivitas di region-nya
   if (user.roleCode === 'anggota' && row.createdBy !== user.id) throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
   if (user.roleCode === 'koordinator' && row.regionId !== user.regionId) throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
 
+  // Ambil semua bukti (evidence) yang terkait dengan aktivitas ini
   const ev = await db.select().from(evidence).where(and(eq(evidence.activityId, id), isNull(evidence.deletedAt)))
+  // Ambil semua ulasan (reviews) yang terkait dengan aktivitas ini, diurutkan berdasarkan tanggal dibuat
   const reviews = await db.select().from(activityReviews).where(eq(activityReviews.activityId, id)).orderBy(asc(activityReviews.createdAt))
 
   return { data: row, evidence: ev, reviews }

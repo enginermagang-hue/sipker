@@ -6,28 +6,33 @@ import { requireAuth } from '#server/utils/session'
 import { requireRole } from '#server/utils/authz'
 import { writeAudit } from '#server/utils/audit'
 
+// Handler utama untuk endpoint POST /api/activities
+// Membuat aktivitas baru dengan status 'draft'
+// Parameter: body berisi data aktivitas (schoolId, categoryId, activityAt, dsb.)
+// Return: { data: aktivitas yang baru dibuat }
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event)
   requireRole(user, 'admin', 'kepala', 'koordinator', 'anggota')
   const body = await readBody(event)
   const db = createDb()
 
-  // Region must come from the user, not the browser
+  // Region wajib berasal dari user, bukan dari browser (keamanan)
+  // Admin/kepala yang membuat atas nama orang lain harus menyertakan regionId
   let regionId = user.regionId
   if (!regionId) {
-    // admin/kepala creating on behalf of someone — must supply regionId
     regionId = String(body.regionId)
   }
 
-  // Validate school belongs to region
+  // Validasi sekolah termasuk dalam region yang sama
   const [school] = await db.select().from(schools).where(and(eq(schools.id, String(body.schoolId)), eq(schools.regionId, regionId))).limit(1)
   if (!school) throw createError({ statusCode: 400, statusMessage: 'School not found in region' })
 
   const now = new Date().toISOString()
+  // Insert data aktivitas baru dengan status 'draft' dan version 1
   const [row] = await db
     .insert(activities)
     .values({
-      id: randomBytes(16).toString('hex'),
+      id: randomBytes(16).toString('hex'), // ID unik acak
       createdBy: user.id,
       regionId,
       schoolId: school.id,
@@ -41,12 +46,13 @@ export default defineEventHandler(async (event) => {
       result: String(body.result).trim(),
       followUp: body.followUp || null,
       notes: body.notes || null,
-      status: 'draft',
+      status: 'draft', // Status awal: draft
       createdAt: now,
       updatedAt: now,
     })
     .returning()
 
+  // Catat audit trail untuk pembuatan aktivitas
   await writeAudit(user, 'activity', row.id, 'create', null, row, event)
 
   return { data: row }

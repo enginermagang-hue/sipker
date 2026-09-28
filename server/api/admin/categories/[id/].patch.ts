@@ -2,12 +2,6 @@
 // Hanya dapat diakses oleh user dengan role 'admin'.
 // Menerima data perubahan dari request body dan memperbarui kategori yang ditemukan.
 // Menggunakan soft delete check untuk memastikan kategori tidak sedang dihapus.
-import { and, eq, isNull } from 'drizzle-orm'
-import { createDb } from '#server/database/index'
-import { activityCategories } from '#server/database/schema'
-import { requireAuth } from '#server/utils/session'
-import { requireRole } from '#server/utils/authz'
-
 export default defineEventHandler(async (event) => {
   // Mengautentikasi user dari request event dan memastikan user telah login.
   const user = await requireAuth(event)

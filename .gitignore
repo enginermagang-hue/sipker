@@ -22,3 +22,8 @@ logs
 .env
 .env.*
 !.env.example
+
+# Dev artifacts & local secrets
+dev.err
+login.json
+bootstrap-admin.ts
